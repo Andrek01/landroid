@@ -377,6 +377,43 @@ item_structs:
              type: num
         schedule_day_saturday_boundary:
              type: num 
+        _auth_result:
+             type: num
+        battery_charge_cycle_current:
+             type: num
+        blade_time_current:
+             type: num
+        gps_latitude:
+             type: num
+        gps_longitude:
+             type: num
+        ots_enabled:
+             type: num
+        partymode_enabled:
+             type: num
+        partymode:
+             type: num
+        islocked:
+             type: num
+        _auth_result:
+             type: num
+        battery_charge_cycle_current:
+             type: num
+        blade_time_current:
+             type: num
+        gps_latitude:
+             type: num
+        gps_longitude:
+             type: num
+        ots_enabled:
+             type: num
+        partymode_enabled:
+             type: num
+        partymode:
+             type: num
+        islocked:
+             type: num
+            
 
 item_attribute_prefixes: NONE
     # Definition of item attributes that only have a common prefix (enter 'item_attribute_prefixes: NONE' or ommit this section, if section should be empty)

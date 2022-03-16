@@ -31,10 +31,7 @@ from lib.item import Items
 from .webif import WebInterface
 import sys
 
-from _operator import or_
-from builtins import True
 
-import asyncio
 import pyworxcloud
 import time
 
@@ -113,6 +110,7 @@ class landroid(SmartPlugin):
         self.scheduler_add('poll_device', self.poll_device, cycle=self.cycle)
         self.scheduler_add('workload', self._workload, cycle=self.workload_cycle)
         self.scheduler_add('weather', self._get_weather, cycle=60*60)
+        self.scheduler_add('parse', self.parse_worx_attr, cycle=10)
 
         
         self.worx_init()
@@ -206,23 +204,25 @@ class landroid(SmartPlugin):
         self.logger.debug("actState is :'{}' Status-Description :  '{}' Visu-Description {}".format( actState, self._get_childitem('status_description'),myText ))
             
     def worx_init(self):
-        self.loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(self.loop)
-        asyncio.get_event_loop().run_until_complete(self.logon())
-        try:
-            self.loop.close()
-        except:
-            pass
+        #self.loop = asyncio.new_event_loop()
+        #asyncio.set_event_loop(self.loop)
+        #asyncio.get_event_loop().run_until_complete(self.logon())
+        self.logon()
+        #try:
+        #    self.loop.close()
+        #except:
+        #    pass
         self._connected = self.worx.connect(0, False)
         if self._connected != True:
             self.logger.warning("Connection to Broker failed")
 
         
 
-    async def logon(self):
+#    async def logon(self):
+    def logon(self):
         # Initialize connection, using your worx email and password
         #auth = await worx.initialize(self.user,self.pwd)
-        self.auth = await self.worx.initialize(self.user,self.pwd)
+        self.auth = self.worx.initialize(self.user,self.pwd)
 
         if not self.auth:
             #If invalid credentials are used, or something happend during
@@ -288,7 +288,7 @@ class landroid(SmartPlugin):
         if self.alive and caller != self.get_shortname():
             # code to execute if the plugin is not stopped
             # and only, if the item has not been changed by this this plugin:
-            self.logger.info("Update item: {}, item has been changed outside this plugin".format(item.id()))
+            self.logger.debug("Update item: {}, item has been changed outside this plugin".format(item.id()))
             
             if self.has_iattr(item.conf, 'landroid_command'):
                 self.logger.debug("Item '{}' has attribute '{}' found with {}".format( item, 'landroid_command', self.get_iattr_value(item.conf, 'landroid_visu_function')))
@@ -338,61 +338,70 @@ class landroid(SmartPlugin):
         
         if self.auth:
             #Force and update request to get latest state from the device
-            self.logger.warning("Starting to get Update from worx-Cloud")
-            self.worx.update()
-            self.logger.warning("ended to get Update from worx-Cloud")
+            self.logger.debug("Starting to get Update from worx-Cloud")
+            try:
+                self.worx.update()
+            except Exception as err:
+                self.logger.warning("Error while getting update from MQTT-Service")
+            self.logger.debug("ended to get Update from worx-Cloud")
             #Read latest states received from the device
-            self.logger.warning("Starting to get Status from worx-Cloud")
-            self.worx.getStatus()
-            self.logger.warning("ended to get Status from worx-Cloud")
+            self.logger.debug("Starting to get Status from worx-Cloud")
+            try:    
+                self.worx.getStatus()
+            except Exception as err:
+                self.logger.warning("Error while getting update from Worx-Api")
+            self.logger.debug("ended to get Status from worx-Cloud")
             self.parse_worx_attr()
             
             
     def parse_worx_attr(self):
         if self.auth:
             #Store all attributes received from the device to items
-            self.logger.warning("Starting to parse worx-Attributes")
+            self.logger.debug("Starting to parse worx-Attributes")
             attrs = vars(self.worx)
             for item in attrs:
-                self.logger.warning("Got item {} with value {}".format(item,attrs[item]))
+                self.logger.debug("Got item {} with value {}".format(item,attrs[item]))
                 try:
                     self._set_childitem(item, attrs[item])
                 except:
-                    self.logger.warning("Excpetion during parsing worx-Attributes")
+                    self.logger.error("Excpetion during parsing worx-Attributes")
                     pass
-            self.logger.warning("finished to parse worx-Attributes")
+            self.logger.debug("finished to parse worx-Attributes")
     
     
     def _get_weather(self):
         if not self.auth:
             return
-        myUrl = "/product-items/{}/weather/current".format(self.worx.serial)
+        myUrl = "/product-items/{}/weather/current".format(self.worx.serial_number)
         myWeather = self.worx._api._call(myUrl)
-        try:
-            # Parse to items
-            self._set_childitem('weather.main', myWeather['weather'][0]['main'])
-            self._set_childitem('weather.description',myWeather['weather'][0]['description'] )
-            self._set_childitem('weather.icon','http://openweathermap.org/img/wn/{}@2x.png'.format(myWeather['weather'][0]['icon']))
-            self._set_childitem('weather.temp',myWeather['main']['temp'] )
-            self._set_childitem('weather.feels_like',myWeather['main']['feels_like'] )
-            self._set_childitem('weather.temp_min',myWeather['main']['temp_min'] )
-            self._set_childitem('weather.temp_max',myWeather['main']['temp_max'] )
-            self._set_childitem('weather.pressure',myWeather['main']['pressure'] )
-            self._set_childitem('weather.humidity',myWeather['main']['humidity'] )
-            self._set_childitem('weather.wind.speed',myWeather['wind']['speed'] )
-            self._set_childitem('weather.wind.deg',myWeather['wind']['deg'] )
-            if "gust" in myWeather:
-                self._set_childitem('weather.wind.gust',myWeather['wind']['gust'] )
-            else:
-                self._set_childitem('weather.wind.gust',0.0 )
-            self._set_childitem('weather.clouds',myWeather['clouds']['all'] )
-            self._set_childitem('weather.timestamp',time.strftime("%d.%m.%Y %H:%M", time.localtime(int(myWeather['dt']))) )
-            if "rain" in myWeather:
-                self._set_childitem('weather.rain',myWeather['rain']['1h'] )
-            else:
-                self._set_childitem('weather.rain',0.0 )
-        except:
-            self.logger.warning("Problem while parsing weather")
+        if myWeather is not False:
+            try:
+                # Parse to items
+                self._set_childitem('weather.main', myWeather['weather'][0]['main'])
+                self._set_childitem('weather.description',myWeather['weather'][0]['description'] )
+                self._set_childitem('weather.icon','http://openweathermap.org/img/wn/{}@2x.png'.format(myWeather['weather'][0]['icon']))
+                self._set_childitem('weather.temp',myWeather['main']['temp'] )
+                self._set_childitem('weather.feels_like',myWeather['main']['feels_like'] )
+                self._set_childitem('weather.temp_min',myWeather['main']['temp_min'] )
+                self._set_childitem('weather.temp_max',myWeather['main']['temp_max'] )
+                self._set_childitem('weather.pressure',myWeather['main']['pressure'] )
+                self._set_childitem('weather.humidity',myWeather['main']['humidity'] )
+                self._set_childitem('weather.wind.speed',myWeather['wind']['speed'] )
+                self._set_childitem('weather.wind.deg',myWeather['wind']['deg'] )
+                if "gust" in myWeather:
+                    self._set_childitem('weather.wind.gust',myWeather['wind']['gust'] )
+                else:
+                    self._set_childitem('weather.wind.gust',0.0 )
+                self._set_childitem('weather.clouds',myWeather['clouds']['all'] )
+                self._set_childitem('weather.timestamp',time.strftime("%d.%m.%Y %H:%M", time.localtime(int(myWeather['dt']))) )
+                if "rain" in myWeather:
+                    self._set_childitem('weather.rain',myWeather['rain']['1h'] )
+                else:
+                    self._set_childitem('weather.rain',0.0 )
+            except:
+                self.logger.warning("Problem while parsing weather")
+        else:
+            self.logger.warning("Weather returned False")
         
     ##############################################
     # Private functions
