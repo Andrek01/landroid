@@ -31,7 +31,10 @@ from lib.item import Items
 from .webif import WebInterface
 import sys
 
+from _operator import or_
+#from builtins import True
 
+#import asyncio
 import pyworxcloud
 import time
 
@@ -47,7 +50,7 @@ class landroid(SmartPlugin):
     the update functions for the items
     """
 
-    PLUGIN_VERSION = '1.0.0'    # (must match the version specified in plugin.yaml), use '1.0.0' for your initial plugin Release
+    PLUGIN_VERSION = '1.0.1'    # (must match the version specified in plugin.yaml), use '1.0.0' for your initial plugin Release
 
     def __init__(self, sh):
         """
@@ -77,10 +80,7 @@ class landroid(SmartPlugin):
         
         self.worx = pyworxcloud.WorxCloud()
         
-        
-        # Variante ohne asyncio - self.auth wird aber nicht richtig gesetzt
-        #self.auth = self.worx._authenticate(self.user,self.pwd,'worx') 
-
+       
         # get the parameters for the plugin (as defined in metadata plugin.yaml):
         # cycle time in seconds, only needed, if hardware/interface needs to be
         # polled for value changes by adding a scheduler entry in the run method of this plugin
@@ -109,8 +109,8 @@ class landroid(SmartPlugin):
         # setup scheduler for device poll loop   (disable the following line, if you don't need to poll the device. Rember to comment the self_cycle statement in __init__ as well)
         self.scheduler_add('poll_device', self.poll_device, cycle=self.cycle)
         self.scheduler_add('workload', self._workload, cycle=self.workload_cycle)
-        self.scheduler_add('weather', self._get_weather, cycle=60*60)
-        self.scheduler_add('parse', self.parse_worx_attr, cycle=10)
+        #self.scheduler_add('weather', self._get_weather, cycle=60*60)
+        #self.scheduler_add('parse', self.parse_worx_attr, cycle=10)
 
         
         self.worx_init()
@@ -121,7 +121,7 @@ class landroid(SmartPlugin):
         self.alive = True
         if self._connected == True:
             self.poll_device()
-            self._get_weather()
+            #self._get_weather()
             self._handle_state()
         else:
             self.logger.warning("Connection to Broker failed")
@@ -204,24 +204,14 @@ class landroid(SmartPlugin):
         self.logger.debug("actState is :'{}' Status-Description :  '{}' Visu-Description {}".format( actState, self._get_childitem('status_description'),myText ))
             
     def worx_init(self):
-        #self.loop = asyncio.new_event_loop()
-        #asyncio.set_event_loop(self.loop)
-        #asyncio.get_event_loop().run_until_complete(self.logon())
         self.logon()
-        #try:
-        #    self.loop.close()
-        #except:
-        #    pass
         self._connected = self.worx.connect(0, False)
         if self._connected != True:
             self.logger.warning("Connection to Broker failed")
 
-        
 
-#    async def logon(self):
     def logon(self):
         # Initialize connection, using your worx email and password
-        #auth = await worx.initialize(self.user,self.pwd)
         self.auth = self.worx.initialize(self.user,self.pwd)
 
         if not self.auth:
@@ -233,7 +223,6 @@ class landroid(SmartPlugin):
             self.logger.warning("authentication was succesfull logged in ")
             return True
 
-        #asyncio.get_event_loop().run_until_complete(self.logon())
     
     def parse_item(self, item):
         """
@@ -338,19 +327,13 @@ class landroid(SmartPlugin):
         
         if self.auth:
             #Force and update request to get latest state from the device
-            self.logger.debug("Starting to get Update from worx-Cloud")
-            try:
-                self.worx.update()
-            except Exception as err:
-                self.logger.warning("Error while getting update from MQTT-Service")
-            self.logger.debug("ended to get Update from worx-Cloud")
+            self.logger.debug("Starting to get Update from worx-Mqtt-Cloud")
+            self.worx.tryToPoll()
+            self.logger.debug("ended to get Update from Mqtt-worx-Cloud")
             #Read latest states received from the device
-            self.logger.debug("Starting to get Status from worx-Cloud")
-            try:    
-                self.worx.getStatus()
-            except Exception as err:
-                self.logger.warning("Error while getting update from Worx-Api")
-            self.logger.debug("ended to get Status from worx-Cloud")
+            self.logger.debug("Starting to get Status from worx-Api.Cloud")
+            self.worx.getStatus()
+            self.logger.debug("ended to get Status from worx-Api-Cloud")
             self.parse_worx_attr()
             
             
@@ -399,7 +382,7 @@ class landroid(SmartPlugin):
                 else:
                     self._set_childitem('weather.rain',0.0 )
             except:
-                self.logger.warning("Problem while parsing weather")
+                self.logger.info("Weather is currently not working. Feel free to fix.")
         else:
             self.logger.warning("Weather returned False")
         
@@ -430,4 +413,4 @@ class landroid(SmartPlugin):
         if (item != None): 
             item(value, self.get_shortname())
         else:
-            self.logger.warning("Could not set item '{}' to '{}'".format(self.parent_item+'.'+itemname, value))
+            self.logger.info("API provides '{}' but no item '{}' exists.".format(value, self.parent_item+'.'+itemname))

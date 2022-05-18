@@ -12,7 +12,7 @@ plugin:
 #    documentation: https://github.com/smarthomeNG/smarthome/wiki/CLI-Plugin        # url of documentation (wiki) page
 #    support: https://knx-user-forum.de/forum/supportforen/smarthome-py
 
-    version: 1.0.0                  # Plugin version (must match the version specified in __init__.py)
+    version: 1.0.1                  # Plugin version (must match the version specified in __init__.py)
     sh_minversion: 1.5              # minimum shNG version to use this plugin
 #    sh_maxversion:                 # maximum shNG version to use this plugin (leave empty if latest)
 #    py_minversion: 3.6             # minimum Python version to use for this plugin
@@ -73,7 +73,7 @@ item_structs:
                
 
     child:
-        name: Vorlage Struktur Worx-Mower
+#        name: Vorlage Struktur Worx-Mower
         visu:
             charging_time:
                 type: num
@@ -165,7 +165,7 @@ item_structs:
 
         _worx_mqtt_client_id:
              type: str
-        _worx_mqtt_endpoint:
+        mqtt_endpoint:
              type: str
         _api:
              type: foo
@@ -182,8 +182,6 @@ item_structs:
         serial_number:
              type: str
         mac_address:
-             type: str
-        name:
              type: str
         locked:
              type: num
@@ -394,26 +392,7 @@ item_structs:
         partymode:
              type: num
         islocked:
-             type: num
-        _auth_result:
-             type: num
-        battery_charge_cycle_current:
-             type: num
-        blade_time_current:
-             type: num
-        gps_latitude:
-             type: num
-        gps_longitude:
-             type: num
-        ots_enabled:
-             type: num
-        partymode_enabled:
-             type: num
-        partymode:
-             type: num
-        islocked:
-             type: num
-            
+             type: num            
 
 item_attribute_prefixes: NONE
     # Definition of item attributes that only have a common prefix (enter 'item_attribute_prefixes: NONE' or ommit this section, if section should be empty)
