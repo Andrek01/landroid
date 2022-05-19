@@ -189,6 +189,18 @@ div.right
 	</div>
 </div>
 
+<div class="block">
+	<div class="set-2" data-role="collapsible-set" data-theme="c" data-content-theme="a" data-mini="true">
+
+		<div data-role="collapsible" data-collapsed="false">
+			<h3>Kalender</h3>
+
+			{{device.uzsutable('','worx.visu.exclusion_uzsu.uzsu','Mäher-Ausschlusszeiten',['1','3'],['2','4'],['orangered','blue'],['red','red'],'','','true','5m','solid','true','true','true','true','1','list',['Generic-ON:1','Generic-OFF:2','Beregnung-ON:3','Beregnung-OFF:4'])}}
+			{{device.uzsutable('','worx.visu.app_mow_uzsu.uzsu','Mähzeiten App-Kalender',['0','1'],'2',['greenyellow','green'],'red','','','true','5m','solid','true','true','true','true','1','list',['Mähen:0','Mähen+Kante:1','Mähen-Ende:2'])}}
+			{{device.uzsutable('','worx.visu.mow_control_uzsu.uzsu','Mähen nach UZSU',['1','2'],'0',['greenyellow','green'],'red','','','true','5m','solid','true','true','true','true','1','list',['Mähen:1','Mähen+Kante:2','Ende:0'])}}
+		</div>
+	</div>		
+</div>
 
 <div class="block">
 	<div class="set-2" data-role="collapsible-set" data-theme="c" data-content-theme="a" data-mini="true">

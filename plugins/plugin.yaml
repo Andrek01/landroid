@@ -96,7 +96,94 @@ item_structs:
                 cache: 'on'                                                                                
             status_text:
                 type: str
-                cache: 'on'                                
+                cache: 'on'
+            exclusion_uzsu:
+                type: num
+                cache: 'on'
+                uzsu:
+                    type: dict
+                    uzsu_item: ..
+                    cache: True
+                    visu_acl: rw
+
+                    last:
+                        type: foo
+                        visu_acl: ro
+                        eval: "'None' if sh...lastvalue() is None else sh...lastvalue()"
+                        crontab: init = 'None'
+                        eval_trigger: ..
+
+                    active:
+                        type: bool
+                        eval: sh...activate(value)
+                        visu_acl: rw
+
+                        status:
+                            type: bool
+                            eval: sh....activate()
+                            eval_trigger:
+                              - ..
+                              - ...
+                            on_change: .. = value
+                            crontab: init = 0                
+            app_mow_uzsu:
+                type: num
+                cache: 'on'
+                uzsu:
+                    type: dict
+                    uzsu_item: ..
+                    cache: True
+                    visu_acl: rw
+
+                    last:
+                        type: foo
+                        visu_acl: ro
+                        eval: "'None' if sh...lastvalue() is None else sh...lastvalue()"
+                        crontab: init = 'None'
+                        eval_trigger: ..
+
+                    active:
+                        type: bool
+                        eval: sh...activate(value)
+                        visu_acl: rw
+
+                        status:
+                            type: bool
+                            eval: sh....activate()
+                            eval_trigger:
+                              - ..
+                              - ...
+                            on_change: .. = value
+                            crontab: init = 0                                            
+            mow_control_uzsu:
+                type: num
+                cache: 'on'
+                uzsu:
+                    type: dict
+                    uzsu_item: ..
+                    cache: True
+                    visu_acl: rw
+
+                    last:
+                        type: foo
+                        visu_acl: ro
+                        eval: "'None' if sh...lastvalue() is None else sh...lastvalue()"
+                        crontab: init = 'None'
+                        eval_trigger: ..
+
+                    active:
+                        type: bool
+                        eval: sh...activate(value)
+                        visu_acl: rw
+
+                        status:
+                            type: bool
+                            eval: sh....activate()
+                            eval_trigger:
+                              - ..
+                              - ...
+                            on_change: .. = value
+                            crontab: init = 0                
         commands:
             MOW:
                 type: bool
@@ -393,6 +480,49 @@ item_structs:
              type: num
         islocked:
              type: num            
+        schedule_day_sunday_2_start :
+            type:  str
+        schedule_day_sunday_2_duration :
+            type:  num
+        schedule_day_sunday_2_boundary :
+            type:  num
+        schedule_day_monday_2_start :
+            type:  str
+        schedule_day_monday_2_duration :
+            type:  num
+        schedule_day_monday_2_boundary :
+            type:  num
+        schedule_day_tuesday_2_start :
+            type:  str
+        schedule_day_tuesday_2_duration :
+            type:  num
+        schedule_day_tuesday_2_boundary :
+            type:  num
+        schedule_day_wednesday_2_start :
+            type:  str
+        schedule_day_wednesday_2_duration :
+            type:  num
+        schedule_day_wednesday_2_boundary :
+            type:  num
+        schedule_day_thursday_2_start :
+            type:  str
+        schedule_day_thursday_2_duration :
+            type:  num
+        schedule_day_thursday_2_boundary :
+            type:  num
+        schedule_day_friday_2_start :
+            type:  str
+        schedule_day_friday_2_duration :
+            type:  num
+        schedule_day_friday_2_boundary :
+            type:  num
+        schedule_day_saturday_2_start :
+            type:  str
+        schedule_day_saturday_2_duration :
+            type:  num
+        schedule_day_saturday_2_boundary :
+            type:  num
+        
 
 item_attribute_prefixes: NONE
     # Definition of item attributes that only have a common prefix (enter 'item_attribute_prefixes: NONE' or ommit this section, if section should be empty)

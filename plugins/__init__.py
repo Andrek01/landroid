@@ -158,9 +158,151 @@ class landroid(SmartPlugin):
         bc  = edgecut 
         wtm = worktime
         """
-        myPayload={'ots':{'bc:' : True,'wtm': 300 }}
-        self.worx._mqtt.publish(self.worx.mqtt_in, myPayload, qos=0, retain=False)
+        #myPayload={'ots':{'bc:' : True,'wtm': 300 }}
+        #self.worx._mqtt.publish(self.worx.mqtt_in, myPayload, qos=0, retain=False)
+        self.worx.startEdgecut()
         
+    
+    def _calc_calendar(self):
+        # Create UZSU-Dict for Exclusion-Calendar
+        myDays = ['SU','MO','TU','WE','TH','FR','SA']
+        dayCounter = 0
+        myList1 = {}
+
+        attrs = vars(self.worx)
+        mydict = attrs['auto_schedule_settings']['exclusion_scheduler']['days']
+        for entry in mydict:
+            if entry['exclude_day'] == True:
+                dayCounter += 1
+                continue
+            for slot in entry['slots']:
+                StartMin = slot['start_time']
+                EndeMin = slot['start_time']+slot['duration']
+                Reason = slot['reason']
+                StartTime = "%02d" % (int(StartMin/60))+':'+"%02d" % (StartMin-int(StartMin/60)*60)
+                Endtime   = "%02d" % (int(EndeMin/60))+':'+"%02d" % (EndeMin-int(EndeMin/60)*60)
+                print (myDays[dayCounter] + ' - ' + StartTime + ' - ' + Endtime + ' - ' + Reason)
+                myKey = StartTime+'-ON-'+Reason
+                if myKey in myList1:
+                    myList1[myKey].append(myDays[dayCounter])
+                else:
+                    myList1[myKey] = []
+                    myList1[myKey].append(myDays[dayCounter])
+
+                myKey = Endtime + '-OFF-' + Reason
+                if myKey in myList1:
+                    myList1[myKey].append(myDays[dayCounter])
+                else:
+                    myList1[myKey] = []
+                    myList1[myKey].append(myDays[dayCounter])
+
+            dayCounter += 1
+
+        myUzsuItem = {
+           "interpolation":{
+              "type":"none",
+              "initialized":False,
+              "itemtype":"num",
+              "interval":"",
+              "initage":""
+           },
+           "list":[
+           ],
+           "active":True
+        }
+        for entry in myList1:
+            myType = entry.split('-')[2]
+            myOnOff = entry.split('-')[1]
+            myTime = entry.split('-')[0]
+            if myType == 'generic' and myOnOff == 'ON' :
+                myValue = "1"
+            elif myType == 'generic' and myOnOff == 'OFF' :
+                myValue = "2"
+            elif myType == 'irrigation' and myOnOff == 'ON' :
+                myValue = "3"
+            elif myType == 'irrigation' and myOnOff == 'OFF' :
+                myValue = "4"
+
+            newEntry =  {
+                         "active":True,
+                         "rrule":"FREQ=WEEKLY;BYDAY="+",".join(myList1[entry]),
+                         "value":myValue,
+                         "time":myTime
+                      }
+            myUzsuItem['list'].append(newEntry)
+
+        # Set dict to UZSU-Dict
+        self._set_childitem('visu.exclusion_uzsu.uzsu',myUzsuItem )
+        
+        
+        # Create UZSU-Dict for Mow-Calendar
+        myList1 = {}
+        for entry in attrs:
+            if ('schedule_day' in entry):
+                if ("start" in entry):
+                    StartTime = attrs[entry]
+                    mytxtDuration = "_".join(entry.split("_")[:3])+'_duration'
+                    myDuration = int(attrs[mytxtDuration])
+                    intStart = int(StartTime.split(":")[0])*60 + int(StartTime.split(":")[1])
+                    intEndTime = intStart + myDuration
+                    Endtime = "%02d" % (int(intEndTime / 60)) + ':' + "%02d" % (intEndTime - int(intEndTime / 60) * 60)
+                    if (myDuration == 0):
+                        continue
+                    mytxtboundary = "_".join(entry.split("_")[:3]) + '_boundary'
+                    myboundary = int(attrs[mytxtboundary])
+                    myDays = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA']
+                    myWeekDays = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday']
+                    dayCounter = myWeekDays.index(entry.split("_")[2])
+
+                    myKey = StartTime + '-ON-' + str(myboundary)
+                    if myKey in myList1:
+                        myList1[myKey].append(myDays[dayCounter])
+                    else:
+                        myList1[myKey] = []
+                        myList1[myKey].append(myDays[dayCounter])
+
+                    myKey = Endtime + '-OFF-' + str(myboundary)
+                    if myKey in myList1:
+                        myList1[myKey].append(myDays[dayCounter])
+                    else:
+                        myList1[myKey] = []
+                        myList1[myKey].append(myDays[dayCounter])
+
+                print(entry + ' : ' + str(attrs[entry]))
+        myUzsuItem = {
+            "interpolation": {
+                "type": "none",
+                "initialized": False,
+                "itemtype": "num",
+                "interval": "",
+                "initage": ""
+            },
+            "list": [
+            ],
+            "active": True
+        }
+        for entry in myList1:
+            myType = entry.split('-')[2]
+            myOnOff = entry.split('-')[1]
+            myTime = entry.split('-')[0]
+            if myType == '0' and myOnOff == 'ON':
+                myValue = "0"
+            elif myType == '1' and myOnOff == 'ON':
+                myValue = "1"
+            elif myOnOff == 'OFF':
+                myValue = "2"
+
+            newEntry = {
+                "active": True,
+                "rrule": "FREQ=WEEKLY;BYDAY=" + ",".join(myList1[entry]),
+                "value": myValue,
+                "time": myTime
+            }
+            myUzsuItem['list'].append(newEntry)    
+        
+        # Set dict to UZSU-Dict
+        self._set_childitem('visu.app_mow_uzsu.uzsu',myUzsuItem )
+    
     def _workload(self):
         charging_time = self._get_childitem('visu.charging_time')
         moving_time   = self._get_childitem('visu.moving_time')
@@ -350,6 +492,7 @@ class landroid(SmartPlugin):
                     self.logger.error("Excpetion during parsing worx-Attributes")
                     pass
             self.logger.debug("finished to parse worx-Attributes")
+            self._calc_calendar()
     
     
     def _get_weather(self):
