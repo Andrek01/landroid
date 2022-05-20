@@ -168,71 +168,72 @@ class landroid(SmartPlugin):
         myDays = ['SU','MO','TU','WE','TH','FR','SA']
         dayCounter = 0
         myList1 = {}
-
-        attrs = vars(self.worx)
-        mydict = attrs['auto_schedule_settings']['exclusion_scheduler']['days']
-        for entry in mydict:
-            if entry['exclude_day'] == True:
-                dayCounter += 1
-                continue
-            for slot in entry['slots']:
-                StartMin = slot['start_time']
-                EndeMin = slot['start_time']+slot['duration']
-                Reason = slot['reason']
-                StartTime = "%02d" % (int(StartMin/60))+':'+"%02d" % (StartMin-int(StartMin/60)*60)
-                Endtime   = "%02d" % (int(EndeMin/60))+':'+"%02d" % (EndeMin-int(EndeMin/60)*60)
-                print (myDays[dayCounter] + ' - ' + StartTime + ' - ' + Endtime + ' - ' + Reason)
-                myKey = StartTime+'-ON-'+Reason
-                if myKey in myList1:
-                    myList1[myKey].append(myDays[dayCounter])
-                else:
-                    myList1[myKey] = []
-                    myList1[myKey].append(myDays[dayCounter])
-
-                myKey = Endtime + '-OFF-' + Reason
-                if myKey in myList1:
-                    myList1[myKey].append(myDays[dayCounter])
-                else:
-                    myList1[myKey] = []
-                    myList1[myKey].append(myDays[dayCounter])
-
-            dayCounter += 1
-
         myUzsuItem = {
-           "interpolation":{
-              "type":"none",
-              "initialized":False,
-              "itemtype":"num",
-              "interval":"",
-              "initage":""
-           },
-           "list":[
-           ],
-           "active":True
-        }
-        for entry in myList1:
-            myType = entry.split('-')[2]
-            myOnOff = entry.split('-')[1]
-            myTime = entry.split('-')[0]
-            if myType == 'generic' and myOnOff == 'ON' :
-                myValue = "1"
-            elif myType == 'generic' and myOnOff == 'OFF' :
-                myValue = "2"
-            elif myType == 'irrigation' and myOnOff == 'ON' :
-                myValue = "3"
-            elif myType == 'irrigation' and myOnOff == 'OFF' :
-                myValue = "4"
+               "interpolation":{
+                  "type":"none",
+                  "initialized":False,
+                  "itemtype":"num",
+                  "interval":"",
+                  "initage":""
+               },
+               "list":[
+               ],
+               "active":True
+            }
+        attrs = vars(self.worx)
+        if ('exclusion_scheduler' in mydict):
+            mydict = attrs['auto_schedule_settings']['exclusion_scheduler']['days']
+            for entry in mydict:
+                if entry['exclude_day'] == True:
+                    dayCounter += 1
+                    continue
+                for slot in entry['slots']:
+                    StartMin = slot['start_time']
+                    EndeMin = slot['start_time']+slot['duration']
+                    Reason = slot['reason']
+                    StartTime = "%02d" % (int(StartMin/60))+':'+"%02d" % (StartMin-int(StartMin/60)*60)
+                    Endtime   = "%02d" % (int(EndeMin/60))+':'+"%02d" % (EndeMin-int(EndeMin/60)*60)
+                    print (myDays[dayCounter] + ' - ' + StartTime + ' - ' + Endtime + ' - ' + Reason)
+                    myKey = StartTime+'-ON-'+Reason
+                    if myKey in myList1:
+                        myList1[myKey].append(myDays[dayCounter])
+                    else:
+                        myList1[myKey] = []
+                        myList1[myKey].append(myDays[dayCounter])
 
-            newEntry =  {
-                         "active":True,
-                         "rrule":"FREQ=WEEKLY;BYDAY="+",".join(myList1[entry]),
-                         "value":myValue,
-                         "time":myTime
-                      }
-            myUzsuItem['list'].append(newEntry)
+                    myKey = Endtime + '-OFF-' + Reason
+                    if myKey in myList1:
+                        myList1[myKey].append(myDays[dayCounter])
+                    else:
+                        myList1[myKey] = []
+                        myList1[myKey].append(myDays[dayCounter])
+
+                dayCounter += 1
+            
+            for entry in myList1:
+                myType = entry.split('-')[2]
+                myOnOff = entry.split('-')[1]
+                myTime = entry.split('-')[0]
+                if myType == 'generic' and myOnOff == 'ON' :
+                    myValue = "1"
+                elif myType == 'generic' and myOnOff == 'OFF' :
+                    myValue = "2"
+                elif myType == 'irrigation' and myOnOff == 'ON' :
+                    myValue = "3"
+                elif myType == 'irrigation' and myOnOff == 'OFF' :
+                    myValue = "4"
+
+                newEntry =  {
+                             "active":True,
+                             "rrule":"FREQ=WEEKLY;BYDAY="+",".join(myList1[entry]),
+                             "value":myValue,
+                             "time":myTime
+                          }
+                myUzsuItem['list'].append(newEntry)
 
         # Set dict to UZSU-Dict
         self._set_childitem('visu.exclusion_uzsu.uzsu',myUzsuItem )
+        
         
         
         # Create UZSU-Dict for Mow-Calendar
