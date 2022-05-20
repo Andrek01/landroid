@@ -201,7 +201,12 @@ item_structs:
                 type: bool
                 visu_acl: rw
                 landroid_command: 'self.worx.stop()'
-                autotimer: 1 = False                        
+                autotimer: 1 = False
+            EDGECUT:
+                type: bool
+                visu_acl: rw
+                landroid_command: 'self.worx.startEdgecut()'
+                autotimer: 1 = False                                        
         weather:
             main:
                 type: str
