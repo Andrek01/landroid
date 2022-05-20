@@ -420,10 +420,10 @@ class landroid(SmartPlugin):
             # code to execute if the plugin is not stopped
             # and only, if the item has not been changed by this this plugin:
             self.logger.debug("Update item: {}, item has been changed outside this plugin".format(item.id()))
-            
+            myType = item.type()
             if self.has_iattr(item.conf, 'landroid_command'):
-                self.logger.debug("Item '{}' has attribute '{}' found with {}".format( item, 'landroid_command', self.get_iattr_value(item.conf, 'landroid_visu_function')))
-                if (item() == True):
+                self.logger.debug("Item : '{}' has attribute : '{}' found with : {}, type : {}".format( item, 'landroid_command', self.get_iattr_value(item.conf, 'landroid_command'),myType))
+                if ((item() == True and myType == 'bool') or myType == 'num'):
                     myFunction_Name = self.get_iattr_value(item.conf, 'landroid_command')
                     myFunction = eval(myFunction_Name)
 
@@ -442,7 +442,20 @@ class landroid(SmartPlugin):
                 myFunction(item)    
             
                 
-
+    def _handle_uzsu(self):
+        actValue = int(self._get_childitem('visu.mow_control_uzsu'))
+        self.logger.debug("handle_UZSU with Value : {}".format(actValue))
+        if (actValue == 1):
+            self.worx.start()
+            self.logger.debug("Start Mower by UZSU")
+        elif (actValue == 2):
+            self.worx.startEdgecut()
+            self.logger.debug("Cut Edge Mower by UZSU")
+        elif (actValue == 0):
+            self.worx.stop()
+            self.logger.debug("go Home Mower by UZSU")
+        
+        
     def poll_device(self):
         """
         Polls for updates of the device

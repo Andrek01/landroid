@@ -1,2 +1,2 @@
-pyworxcloud == 1.4.19
+pyworxcloud == 1.4.20
 

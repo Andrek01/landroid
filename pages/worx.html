@@ -169,9 +169,10 @@ div.right
 					<td width="100%">
 						<div data-role="controlgroup" data-type="horizontal">
 							Kommando:<br>
-							{{ basic.stateswitch('Indego_start', 'worx.commands.MOW', 'midi', '', 'scene_robo_lawnmower_start.svg') }}
-							{{ basic.stateswitch('Indego_pause', 'worx.commands.PAUSE', 'midi', '', 'scene_robo_lawnmower_stop.svg') }}
-							{{ basic.stateswitch('Indego_return', 'worx.commands.RETURN', 'midi', '', 'scene_robo_lawnmower_dock.svg') }}
+							{{ basic.stateswitch('Indego_start', 'worx.commands.MOW', 'midi', '', 'scene_robo_lawnmower_start.svg','Mow') }}
+							{{ basic.stateswitch('Indego_pause', 'worx.commands.PAUSE', 'midi', '', 'scene_robo_lawnmower_stop.svg','Pause') }}
+							{{ basic.stateswitch('Indego_return', 'worx.commands.RETURN', 'midi', '', 'scene_robo_lawnmower_dock.svg','Return') }}
+							{{basic.stateswitch('Indego_return','worx.commands.EDGECUT','midi','','scene_robo_lawnmower_dock.svg','Edge')}}
 						</div>
 					</td>
 				</tr>
@@ -197,7 +198,7 @@ div.right
 
 			{{device.uzsutable('','worx.visu.exclusion_uzsu.uzsu','Mäher-Ausschlusszeiten',['1','3'],['2','4'],['orangered','blue'],['red','red'],'','','true','5m','solid','true','true','true','true','1','list',['Generic-ON:1','Generic-OFF:2','Beregnung-ON:3','Beregnung-OFF:4'])}}
 			{{device.uzsutable('','worx.visu.app_mow_uzsu.uzsu','Mähzeiten App-Kalender',['0','1'],'2',['greenyellow','green'],'red','','','true','5m','solid','true','true','true','true','1','list',['Mähen:0','Mähen+Kante:1','Mähen-Ende:2'])}}
-			{{device.uzsutable('','worx.visu.mow_control_uzsu.uzsu','Mähen nach UZSU',['1','2'],'0',['greenyellow','green'],'red','','','true','5m','solid','true','true','true','true','1','list',['Mähen:1','Mähen+Kante:2','Ende:0'])}}
+			{{device.uzsutable('','worx.visu.mow_control_uzsu.uzsu','Mähen nach UZSU',['1','2'],'0',['greenyellow','green'],'red','','','true','5m','solid','true','true','true','true','1','list',['Mähen:1','Kante:2','Ende:0'])}}
 		</div>
 	</div>		
 </div>
