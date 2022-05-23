@@ -178,7 +178,7 @@ class landroid(SmartPlugin):
                },
                "list":[
                ],
-               "active":True
+               "active":False
             }
         attrs = vars(self.worx)
         if ('exclusion_scheduler' in attrs):
@@ -193,7 +193,7 @@ class landroid(SmartPlugin):
                     Reason = slot['reason']
                     StartTime = "%02d" % (int(StartMin/60))+':'+"%02d" % (StartMin-int(StartMin/60)*60)
                     Endtime   = "%02d" % (int(EndeMin/60))+':'+"%02d" % (EndeMin-int(EndeMin/60)*60)
-                    print (myDays[dayCounter] + ' - ' + StartTime + ' - ' + Endtime + ' - ' + Reason)
+                    
                     myKey = StartTime+'-ON-'+Reason
                     if myKey in myList1:
                         myList1[myKey].append(myDays[dayCounter])
@@ -242,7 +242,10 @@ class landroid(SmartPlugin):
             if ('schedule_day' in entry):
                 if ("start" in entry):
                     StartTime = attrs[entry]
-                    mytxtDuration = "_".join(entry.split("_")[:3])+'_duration'
+                    if (len(entry.split("_")) == 4):
+                        mytxtDuration = "_".join(entry.split("_")[:3])+'_duration'
+                    elif (len(entry.split("_")) == 5):
+                        mytxtDuration = "_".join(entry.split("_")[:4])+'_duration'
                     myDuration = int(attrs[mytxtDuration])
                     intStart = int(StartTime.split(":")[0])*60 + int(StartTime.split(":")[1])
                     intEndTime = intStart + myDuration
@@ -269,7 +272,7 @@ class landroid(SmartPlugin):
                         myList1[myKey] = []
                         myList1[myKey].append(myDays[dayCounter])
 
-                print(entry + ' : ' + str(attrs[entry]))
+                
         myUzsuItem = {
             "interpolation": {
                 "type": "none",
@@ -280,7 +283,7 @@ class landroid(SmartPlugin):
             },
             "list": [
             ],
-            "active": True
+            "active": False
         }
         for entry in myList1:
             myType = entry.split('-')[2]
