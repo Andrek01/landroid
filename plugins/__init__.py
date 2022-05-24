@@ -164,6 +164,13 @@ class landroid(SmartPlugin):
         
     
     def _calc_calendar(self):
+        # get sunrise/sunset
+        myItem = self.items.return_item('env.location.sunrise')
+        sunrise = myItem()
+        myItem = self.items.return_item('env.location.sunset')
+        sunset = myItem()
+        sunrise = (str(sunrise.time())[:5])
+        sunset = (str(sunset.time())[:5])
         # Create UZSU-Dict for Exclusion-Calendar
         myDays = ['SU','MO','TU','WE','TH','FR','SA']
         dayCounter = 0
@@ -178,7 +185,9 @@ class landroid(SmartPlugin):
                },
                "list":[
                ],
-               "active":False
+               "active":False,
+               "sunrise": sunrise,
+               "sunset": sunset
             }
         attrs = vars(self.worx)
         if ('exclusion_scheduler' in str(attrs)):
@@ -232,7 +241,7 @@ class landroid(SmartPlugin):
                 myUzsuItem['list'].append(newEntry)
 
         # Set dict to UZSU-Dict
-        self._set_childitem('visu.exclusion_uzsu.uzsu',myUzsuItem )
+        self._set_childitem('visu.exclusion_uzsu.timer',myUzsuItem )
         
         
         
@@ -283,7 +292,9 @@ class landroid(SmartPlugin):
             },
             "list": [
             ],
-            "active": False
+            "active": False,
+            "sunrise": sunrise,
+            "sunset": sunset
         }
         for entry in myList1:
             myType = entry.split('-')[2]
@@ -305,7 +316,7 @@ class landroid(SmartPlugin):
             myUzsuItem['list'].append(newEntry)    
         
         # Set dict to UZSU-Dict
-        self._set_childitem('visu.app_mow_uzsu.uzsu',myUzsuItem )
+        self._set_childitem('visu.app_mow_uzsu.timer',myUzsuItem )
     
     def _workload(self):
         charging_time = self._get_childitem('visu.charging_time')

@@ -15,6 +15,9 @@ Landroid-Plugin (proof of concept)
 
 - bugfix für parsen des Exclusion Kalenders
 - Erweiterung der structs um rain_sensor_triggered / rain_delay_time_remaining
+>**BREAKING CHANGE of items**
+>worx.visu.exclusion_uzsu.uzsu -> worx.visu.exclusion_uzsu.timer
+>worx.visu.app_mow_uzsu.uzsu   -> worx.visu.app_mow_uzsu.timer
 
 ### 2022-05-20
 - Verwendung von Pyworxcloud 1.4.20

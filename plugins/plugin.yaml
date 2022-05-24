@@ -100,61 +100,13 @@ item_structs:
             exclusion_uzsu:
                 type: num
                 cache: 'on'
-                uzsu:
+                timer:
                     type: dict
-                    uzsu_item: ..
-                    cache: True
-                    visu_acl: rw
-
-                    last:
-                        type: foo
-                        visu_acl: ro
-                        eval: "'None' if sh...lastvalue() is None else sh...lastvalue()"
-                        crontab: init = 'None'
-                        eval_trigger: ..
-
-                    active:
-                        type: bool
-                        eval: sh...activate(value)
-                        visu_acl: rw
-
-                        status:
-                            type: bool
-                            eval: sh....activate()
-                            eval_trigger:
-                              - ..
-                              - ...
-                            on_change: .. = value
-                            crontab: init = 0                
             app_mow_uzsu:
                 type: num
                 cache: 'on'
-                uzsu:
+                timer:
                     type: dict
-                    uzsu_item: ..
-                    cache: True
-                    visu_acl: rw
-
-                    last:
-                        type: foo
-                        visu_acl: ro
-                        eval: "'None' if sh...lastvalue() is None else sh...lastvalue()"
-                        crontab: init = 'None'
-                        eval_trigger: ..
-
-                    active:
-                        type: bool
-                        eval: sh...activate(value)
-                        visu_acl: rw
-
-                        status:
-                            type: bool
-                            eval: sh....activate()
-                            eval_trigger:
-                              - ..
-                              - ...
-                            on_change: .. = value
-                            crontab: init = 0                                            
             mow_control_uzsu:
                 type: num
                 cache: 'on'
