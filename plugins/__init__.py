@@ -181,7 +181,7 @@ class landroid(SmartPlugin):
                "active":False
             }
         attrs = vars(self.worx)
-        if ('exclusion_scheduler' in attrs):
+        if ('exclusion_scheduler' in str(attrs)):
             mydict = attrs['auto_schedule_settings']['exclusion_scheduler']['days']
             for entry in mydict:
                 if entry['exclude_day'] == True:

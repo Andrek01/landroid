@@ -10,6 +10,12 @@ Landroid-Plugin (proof of concept)
 
 ## Changelog <a name="changelog"/></a>
 
+
+### 2022-05-23
+
+- bugfix für parsen des Exclusion Kalenders
+- Erweiterung der structs um rain_sensor_triggered / rain_delay_time_remaining
+
 ### 2022-05-20
 - Verwendung von Pyworxcloud 1.4.20
 - requirements auf pyworxcloud == 1.4.20 gesetzt

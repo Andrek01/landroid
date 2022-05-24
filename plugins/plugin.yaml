@@ -158,6 +158,7 @@ item_structs:
             mow_control_uzsu:
                 type: num
                 cache: 'on'
+                landroid_command: 'self._handle_uzsu()'
                 uzsu:
                     type: dict
                     uzsu_item: ..
@@ -527,7 +528,10 @@ item_structs:
             type:  num
         schedule_day_saturday_2_boundary :
             type:  num
-        
+        rain_delay_time_remaining:
+            type: num
+        rain_sensor_triggered:
+            type: num        
 
 item_attribute_prefixes: NONE
     # Definition of item attributes that only have a common prefix (enter 'item_attribute_prefixes: NONE' or ommit this section, if section should be empty)
