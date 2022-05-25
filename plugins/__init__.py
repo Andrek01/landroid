@@ -165,12 +165,17 @@ class landroid(SmartPlugin):
     
     def _calc_calendar(self):
         # get sunrise/sunset
-        myItem = self.items.return_item('env.location.sunrise')
-        sunrise = myItem()
-        myItem = self.items.return_item('env.location.sunset')
-        sunset = myItem()
-        sunrise = (str(sunrise.time())[:5])
-        sunset = (str(sunset.time())[:5])
+        try:
+            myItem = self.items.return_item('env.location.sunrise')
+            sunrise = myItem()
+            myItem = self.items.return_item('env.location.sunset')
+            sunset = myItem()
+            sunrise = (str(sunrise.time())[:5])
+            sunset = (str(sunset.time())[:5])
+        except:
+            sunrise = '07:00'
+            sunset = '19:00'
+            pass
         # Create UZSU-Dict for Exclusion-Calendar
         myDays = ['SU','MO','TU','WE','TH','FR','SA']
         dayCounter = 0
